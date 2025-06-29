@@ -70,15 +70,7 @@ impl AlgorithmIdentifier {
     }
 
     fn encoded_values(&self, mode: Mode) -> impl Values + '_ {
-        // parameters is strictly OPTIONAL, which means we can omit it completely.
-        // However, it is common to see this field encoded as NULL and some
-        // parsers seem to insist the NULL be there or else they refuse to
-        // parse the ASN.1. So we ensure this field is always set.
-        let captured = if let Some(params) = self.parameters.as_ref() {
-            params.clone()
-        } else {
-            AlgorithmParameter(Captured::from_values(mode, ().encode_as(Tag::NULL)))
-        };
+        let captured = self.parameters.as_ref().cloned();
 
         encode::sequence((self.algorithm.clone().encode(), captured))
     }
